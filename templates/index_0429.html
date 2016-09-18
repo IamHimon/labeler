@@ -1,0 +1,167 @@
+<!doctype html>
+{% load staticfiles %}
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>车牌标注系统</title>
+<link rel="stylesheet" type="text/css" href="{% static 'css/normalize.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/default.css"' %}">
+<link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'dist/cropper.css' %}" rel="stylesheet">
+
+<link href="{% static 'css/main.css' %}"  rel="stylesheet">
+<!--[if IE]>
+	<script src="http://libs.useso.com/js/html5shiv/3.7/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+<div class="htmleaf-container">
+	<!-- Content -->
+<div class="container">
+<div class="row">
+<form id="uploadForm">
+  <div class="col-md-9">
+	<!-- <h3 class="page-header">Demo:</h3> -->
+	<div class="img-container">
+	   <img src="{% static 'assets/img/pic.jpg' %}" alt="Picture">
+	</div>
+  </div>
+  <div class="col-md-3">
+	<!-- <h3 class="page-header">Preview:</h3> -->
+	<div class="docs-preview clearfix">
+	  <div class="img-preview preview-lg"></div>
+	  <div class="img-preview preview-md"></div>
+	  <div class="img-preview preview-sm"></div>
+	  <div class="img-preview preview-xs"></div>
+	</div>
+
+	<!-- <h3 class="page-header">Data:</h3> -->
+	<div class="docs-data">
+	  <div class="input-group">
+		<label class="input-group-addon" for="dataX">X</label>
+		<input class="form-control" id="dataX" type="text" placeholder="x" name="x">
+		<span class="input-group-addon">px</span>
+	  </div>
+	  <div class="input-group">
+		<label class="input-group-addon" for="dataY">Y</label>
+		<input class="form-control" id="dataY" type="text" placeholder="y" name="y">
+		<span class="input-group-addon">px</span>
+	  </div>
+	  <div class="input-group">
+		<label class="input-group-addon" for="dataWidth">Width</label>
+		<input class="form-control" id="dataWidth" type="text" placeholder="width" name="w">
+		<span class="input-group-addon">px</span>
+	  </div>
+	  <div class="input-group">
+		<label class="input-group-addon" for="dataHeight">Height</label>
+		<input class="form-control" id="dataHeight" type="text" placeholder="height" name="h">
+		<span class="input-group-addon">px</span>
+	  </div>
+	
+	</div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-9 center">
+	<!-- <h3 class="page-header">Toolbar:</h3> -->
+	
+	<div class="btn-group" width="80%">
+	 <label class="btn btn-primary btn-upload" for="inputImage" title="Upload image file" width="80%">
+		<!--<input class="sr-only" id="inputImage" name="file" type="file" accept="image/*">-->
+		
+		
+		<input class="sr-only"  id="inputImage" name="file" type="file" accept="image/*">
+		<span class="docs-tooltip" data-toggle="tooltip" title="Import image with Blob URLs">
+		  <span>选择</span>
+		</span>
+	  </label>
+	</div>
+	
+	<div class="btn-group">
+	  <button class="btn btn-primary" id="submit" type="button"  aria-expanded="true">
+		<span class="docs-tooltip">
+		  <span>提交</span>
+		</span>
+	  </button>
+	</div>
+  </div><!-- /.docs-buttons -->
+  
+
+  
+  
+  
+  
+  
+
+  <div class="col-md-3 docs-toggles">
+	<!-- <h3 class="page-header">Toggles:</h3> -->
+
+
+	
+  </div><!-- /.docs-toggles -->
+ <!-- </form> -->
+  
+  
+</div>
+</div>
+<!-- Alert -->
+
+
+<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'dist/cropper.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+
+</body>
+</html>
+<div style="display:none">
+	<script type="text/javascript">
+	
+	
+     $(function(){
+		$("#submit").click(function(){
+		//alert("sub");
+		x = $("#dataX").val();
+		y = $("#dataY").val();
+		w = $("#dataWidth").val();
+		h = $("#dataHeight").val();
+		//alert(imageId);
+		//+x+'y='+y+'w='+w+'h='+h
+  
+		/*
+		$.get('/sub?imageId='+imageId+'&x='+x+'&y='+y+'&w='+w+'&h='+h,function(data){
+			if(data=="1"){
+				alert("提交成功");
+			}else{
+				alert("提交失败");
+			}
+		});
+		*/
+		 var formData = new FormData($( "#uploadForm" )[0]);  
+		 $.ajax({  
+			  url: '/sub/' ,  
+			  type: 'POST',  
+			  data: formData,  
+			  async: false,  
+			  cache: false,  
+			  contentType: false,  
+			  processData: false,  
+			  success: function (returndata) {  
+				  if(returndata == "1")
+					alert("提交成功");
+				  else{
+					alert("提交失败，请重试！");
+				  }
+			  },  
+			  error: function (returndata) {  
+				  alert("提交失败，请重试！");  
+			  }  
+      });  
+		
+	 });
+	});
+	
+	</script>
+</div>

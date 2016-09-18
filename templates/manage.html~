@@ -1,0 +1,57 @@
+<!doctype html>
+{% load staticfiles %}
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>车牌标注系统</title>
+<link rel="stylesheet" type="text/css" href="{% static 'css/normalize.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/default.css"' %}">
+<link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'dist/cropper.css' %}" rel="stylesheet">
+
+<link href="{% static 'css/main.css' %}"  rel="stylesheet">
+<style>
+	.box{
+		border:1px solid red;
+		width:100px;
+		height:50px;
+	}
+	.car{
+		width: 500px; height:500px;padding:5px;
+		position:relative;
+	}
+</style>
+<!--[if IE]>
+	<script src="http://libs.useso.com/js/html5shiv/3.7/html5shiv.min.js"></script>
+<![endif]-->
+</head>
+<body>
+	<!-- Content -->
+<div class="container-fluid">
+<div class="row">
+  <div class="col-md-12">
+	 <ul>
+		
+		{% for key in imgList %}
+			<li style="list-style:none;float:left;margin:5px;    -webkit-box-shadow: 2px 2px 3px #bbb;height:520px">
+				<div class="car">
+					<img src="/car/static/upload/{{ key.0}}" class="img-rounded" style="width: 500px; height:500px;background: #DDD;"/>
+					<div class="box" style="position:absolute;top:{{ key.1}}px;left:{{ key.2}}px;width:{{key.3}}px;height:{{key.4}}px">
+						
+					</div>
+					<span style="display: block;
+    padding: 4px 0 8px;
+    text-align: center;
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;"><strong>{{ key.0}}</strong></span>
+					
+				</div>
+			</li>
+		{% endfor %}
+	</ul>
+  </div>
+</div>
+</div>

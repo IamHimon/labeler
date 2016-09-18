@@ -1,0 +1,186 @@
+#coding:utf-8
+from __future__ import print_function
+import numpy as np
+np.random.seed(1337) # for reproducibility
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers.core import Dense, Dropout, Activation, Flatten
+from keras.layers.convolutional import Convolution2D, MaxPooling2D
+from keras.utils import np_utils
+import cPickle
+import time,os,glob
+from PIL import Image
+from keras.models import model_from_json
+
+from sklearn.cross_validation import train_test_split
+_dict = {'cuan': 100,'gan': 101,'gan1':102,'gui':103,
+         'gui1': 104,'hei': 105,'ji':106,'jin':107,'jing':108,
+         'jl': 109,'liao': 110,'lu':111,'meng':112,'min':113,
+         'ning': 114,'qing': 115,'qiong':116,'shan':117,'su':118,
+         'sx': 119,'wan': 120,'xiang':121,'xin':122,'yu':123,
+         'yu1': 124,'yue': 125,'yun':126,'zang':127,'zhe':128,
+         'e':129,'hu':130
+         }
+reDict = {value:key for key, value in _dict.items()}
+_han_dict = {'cuan':'川','gan':'赣','gan1':'甘','gui':'贵',
+         'gui1': '桂','hei': '甘','ji':'冀','jin':'津','jing':'京',
+         'jl': '吉','liao': '辽','lu':'鲁','meng':'蒙','min':'闽',
+         'ning': '宁','qing': '青','qiong':'琼','shan':'陕','su':'苏',
+         'sx': '晋','wan': '皖','xiang':'湘','xin':'新','yu':'豫',
+         'yu1': '渝','yue': '粤','yun':'云','zang':'藏','zhe':'浙',
+         'e':'鄂','hei':'黑','hu':'沪'
+         }
+
+def load_data(path):
+    dirs = os.listdir(path)
+    data = np.empty((16424,1,20,20),dtype="float32")
+    label = []
+    i = 0;
+    for dir in dirs:
+        imgsPath = os.listdir(path + dir)
+        #print imgsPath
+        for imgPath in imgsPath:
+            #print path + dir + "//"+ imgPath
+            img = Image.open(path + dir + "//"+ imgPath)
+            arr = np.asarray(img,dtype="float32")
+            if len(arr.shape) == 2:
+            #print path + dir + "//"+ imgPath,arr.shape
+                data[i,:,:,:] = arr
+                i = i + 1
+                if str(dir).startswith("zh_"):
+                    label.append(_dict[str(dir).split("_")[1]])
+                elif( (64 < ord(str(dir)))):
+                    label.append(ord(dir))
+                else:
+                    label.append(dir)
+    write_file=open('./data.pkl','wb')    
+    cPickle.dump(data,write_file,-1)    
+    cPickle.dump(label,write_file,-1)    
+    return data,label
+def load_test_data(path):
+    imgs = glob.iglob(path+"/.jpg")
+    label = []
+    data = np.empty((7,1,20,20),dtype="float32")
+    for i in xrange(7):
+        img = Image.open(path+str(i)+".jpg")
+        arr = np.asarray(img,dtype="float32")
+        #print (arr.shape)
+        if(len(arr.shape) ==2):
+            data[i,:,:,:] = arr
+            label.append('3')
+    return data,label
+def cnn_classify():
+    batch_size = 128
+    nb_classes = 200
+    nb_epoch = 60
+    # input image dimensions
+    img_rows, img_cols = 20, 20
+    # number of convolutional filters to use
+    nb_filters = 32
+    # size of pooling area for max pooling
+    nb_pool = 2
+    # convolution kernel size
+    nb_conv = 3
+    # the data, shuffled and split between tran and test sets
+    #read_file=open('./cnn.pkl','rb')    
+    #data=cPickle.load(read_file)    
+    #label=cPickle.load(read_file)  
+    path = "./data/"
+    data,label = load_data(path)
+    
+    X_train, X_test, y_train, y_test = train_test_split(data, label, test_size=0.33, random_state=42)
+    X_train = X_train.reshape(X_train.shape[0], 1, img_rows, img_cols)
+    X_test = X_test.reshape(X_test.shape[0], 1, img_rows, img_cols)
+    X_train = X_train.astype('float32')
+    X_test = X_test.astype('float32')
+    X_train /= 255
+    X_test /= 255
+    print('X_train shape:', X_train.shape)
+    print(X_train.shape[0], 'train samples')
+    print(X_test.shape[0], 'test samples')
+    # convert class vectors to binary class matrices
+    Y_train = np_utils.to_categorical(y_train, nb_classes)
+    Y_test = np_utils.to_categorical(y_test, nb_classes)
+    model = Sequential()
+    
+    model.add(Convolution2D(nb_filters, nb_conv, nb_conv,
+    border_mode='valid',
+    input_shape=(1, img_rows, img_cols)))
+    
+    model.add(Activation('relu'))
+    model.add(Convolution2D(nb_filters, nb_conv, nb_conv))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(nb_pool, nb_pool)))
+    model.add(Dropout(0.25))
+
+
+    model.add(Flatten())
+    model.add(Dense(128))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(nb_classes))
+    model.add(Activation('softmax'))
+    model.compile(loss='categorical_crossentropy', optimizer='adadelta')
+    model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
+    show_accuracy=True, verbose=1, validation_data=(X_test, Y_test))
+    score = model.evaluate(X_test, Y_test, show_accuracy=True, verbose=0)
+    
+    json_string = model.to_json()  
+    open('my_model_architecture.json','w').write(json_string)  
+    model.save_weights('my_model_weights.h5')  
+   
+    #model = model.model_from_json(open('my_model_architecture.json').read())  
+    #model.load_weights('my_model_weights.h5') 
+    
+    
+    print('Test score:', score[0])
+    print('Test accuracy:', score[1])
+def getTestData(imgPath):
+    img = Image.open(imgPath)
+    arr = np.asarray(img,dtype="float32")
+    data = np.empty((1,1,20,20),dtype="float32")
+    data[0,:,:,:] = arr
+   
+    label = []
+    label.append('6')
+    return data,label
+
+def predict():
+   
+    path = "/home/llgf/EasyPR-master/resources/image/"
+    data,label = load_test_data(path)
+    print(data.shape[0])
+    plateRs = model.predict_classes(data)
+    pRS = []
+    for i in xrange(len(plateRs)):
+	pRS.append(plateRs[i]) 	
+   
+    for i in xrange(len(pRS)):
+	if(int(pRS[i]) >= 65 and int(plateRs[i]) <= 90 ):
+		pRS[i] = chr(int(plateRs[i]))
+	elif(int(pRS[i]) >= 100 and int(plateRs[i]) <= 130):
+		print ('****************************************')
+		print (reDict[int(pRS[i])])
+		print (_han_dict[reDict[int(pRS[i])]])
+		pRS[i] = _han_dict[reDict[int(pRS[i])]]
+    #for i in xrange(len(plateRs)):
+	#print plateRs[i]
+    print (pRS)
+    return pRS    
+
+if __name__ == "__main__":
+    #cnn_classify()
+    t1 = time.time()
+    model = model_from_json(open('my_model_architecture.json').read())  
+    model.load_weights('my_model_weights.h5') 
+    t2 = time.time()
+    print ("load over!",t2 - t1)
+    imgPath = "./jing.jpg"
+    data,label = getTestData(imgPath)
+    rsLabel =  model.predict_classes(data)
+    t3 = time.time()
+    print (rsLabel)
+    print (t3 - t2)
+   
+
+

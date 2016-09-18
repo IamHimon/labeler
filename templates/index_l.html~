@@ -1,0 +1,180 @@
+<!doctype html>
+{% load staticfiles %}
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>车牌标注系统</title>
+<link rel="stylesheet" type="text/css" href="/car/static/css/normalize.css" />
+<link rel="stylesheet" type="text/css" href="/car/staticcss/default.css">
+<link href="/car/static/assets/css/bootstrap.min.css" rel="stylesheet">
+<link href="/car/static/dist/cropper.css" rel="stylesheet">
+
+<link href="/car/static/css/main.css"  rel="stylesheet">
+<!--[if IE]>
+	<script src="http://libs.useso.com/js/html5shiv/3.7/html5shiv.min.js"></script>
+<![endif]-->
+
+<style type="text/css">
+#center{    
+   margin:100px auto auto auto;    
+}
+
+
+#job2{
+ margin-top:20px
+}
+</style>
+
+</head>
+<body>
+<div class="htmleaf-container", id="center">
+	<!-- Content -->
+<div class="container">
+<div class="row">
+<form id="uploadForm">
+  <div class="col-md-9">
+	<!-- <h3 class="page-header">Demo:</h3> -->
+	<div class="img-container">
+	   <img src="/car/static/assets/img/example.jpg" alt="Picture">
+	</div>
+  </div>
+  <div class="col-md-3">
+	<!-- <h3 class="page-header">Preview:</h3> -->
+	<div class="docs-preview clearfix">
+	  <div class="img-preview preview-lg"></div>
+	
+	</div>
+
+	<!-- <h3 class="page-header">Data:</h3> -->
+	<div class="docs-data">
+	  <div class="input-group">
+		<label class="input-group-addon" for="dataX">X</label>
+		<input class="form-control" id="dataX" type="text" placeholder="x" name="x">
+		<span class="input-group-addon">px</span>
+	  </div>
+	  <div class="input-group">
+		<label class="input-group-addon" for="dataY">Y</label>
+		<input class="form-control" id="dataY" type="text" placeholder="y" name="y">
+		<span class="input-group-addon">px</span>
+	  </div>
+	  <div class="input-group">
+		<label class="input-group-addon" for="dataWidth">Width</label>
+		<input class="form-control" id="dataWidth" type="text" placeholder="width" name="w">
+		<span class="input-group-addon">px</span>
+	  </div>
+	  <div class="input-group">
+		<label class="input-group-addon" for="dataHeight">Height</label>
+		<input class="form-control" id="dataHeight" type="text" placeholder="height" name="h">
+		<span class="input-group-addon">px</span>
+	  </div>
+	
+	</div>
+	
+        <div id="job2" class="btn-group btn-group-justified" data-toggle="buttons">
+         
+          <label class="btn btn-primary" data-method="setAspectRatio" data-option="4.4" title="Set Aspect Ratio">
+            <input class="sr-only" id="aspestRatio4" name="aspestRatio" value="4.4" type="radio">
+            <span class="docs-tooltip" data-toggle="tooltip" title="$().cropper(&quot;setAspectRatio&quot;, 22/5)">
+             固定比例
+            </span>
+          </label>
+          <label class="btn btn-primary" data-method="setAspectRatio" data-option="NaN" title="Set Aspect Ratio">
+            <input class="sr-only" id="aspestRatio5" name="aspestRatio" value="NaN" type="radio">
+            <span class="docs-tooltip" data-toggle="tooltip" title="$().cropper(&quot;setAspectRatio&quot;, NaN)">
+              自由比例
+            </span>
+          </label>
+        </div>
+
+	<div id="job2">
+		<div style=" float:left">
+			 <label class="btn btn-primary btn-upload" for="inputImage" title="Upload image file" width="80%">
+				<!--<input class="sr-only" id="inputImage" name="file" type="file" accept="image/*">-->	
+		
+				<input class="sr-only"  id="inputImage" name="file" type="file" accept="image/*">
+				<span class="docs-tooltip" data-toggle="tooltip" title="Import image with Blob URLs">
+		 		 <span>选择本地照片</span>
+				</span>
+			  </label>
+		</div>
+	
+		<div style=" float:left; margin-left: 30px"">
+			 <button class="btn btn-primary" id="submit" type="button"  aria-expanded="true" onclick='window.location.reload()'>
+				<span class="docs-tooltip">
+		  		<span>提交结果</span>
+				</span>
+	 		</button>	 
+		</div>	
+
+	</div>	
+	
+  </div>
+</div>
+<div id="align">
+	<h3 >标注指导:</h3>
+	<h4>请确保标注准确,可以放大图片进行标注.请勿重复上传.</h4>	
+<div>
+</div>
+
+</div>
+<!-- Alert -->
+
+
+<script src="/car/static/assets/js/jquery.min.js"></script>
+<script src="/car/static/assets/js/bootstrap.min.js"></script>
+<script src="/car/static/dist/cropper.js"></script>
+<script src="/car/static/js/main.js' %}"></script>
+
+</body>
+</html>
+<div style="display:none">
+	<script type="text/javascript">
+	
+	
+     $(function(){
+		$("#submit").click(function(){
+		//alert("sub");
+		x = $("#dataX").val();
+		y = $("#dataY").val();
+		w = $("#dataWidth").val();
+		h = $("#dataHeight").val();
+		//alert(imageId);
+		//+x+'y='+y+'w='+w+'h='+h
+  
+		/*
+		$.get('/sub?imageId='+imageId+'&x='+x+'&y='+y+'&w='+w+'&h='+h,function(data){
+			if(data=="1"){
+				alert("提交成功");
+			}else{
+				alert("提交失败");
+			}
+		});
+		*/
+		 var formData = new FormData($( "#uploadForm" )[0]);  
+		 $.ajax({  
+			  url: '/sub/' ,  
+			  type: 'POST',  
+			  data: formData,  
+			  async: false,  
+			  cache: false,  
+			  contentType: false,  
+			  processData: false,  
+			  success: function (returndata) {  
+				  if(returndata == "1")
+					alert("提交成功");
+				  else{
+					alert("提交失败，请重试！");
+				  }
+			  },  
+			  error: function (returndata) {  
+				  alert("提交失败，请重试！");  
+			  }  
+      });  
+		
+	 });
+	});
+	
+	</script>
+</div>

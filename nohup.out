@@ -1,0 +1,12 @@
+/home/ada/plate/labeler/PlateWeb/urls.py:27: RemovedInDjango110Warning: django.conf.urls.patterns() is deprecated and will be removed in Django 1.10. Update your urlpatterns to be a list of django.conf.urls.url() instances instead.
+  url(r'',views.index,name='index'),
+
+BASE_DIR--------------/home/ada/plate/labeler
+Performing system checks...
+
+System check identified no issues (0 silenced).
+August 01, 2016 - 06:32:31
+Django version 1.9.2, using settings 'PlateWeb.settings'
+Starting development server at http://192.168.131.198:8000/
+Quit the server with CONTROL-C.
+BASE_DIR--------------/home/ada/plate/labeler

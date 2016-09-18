@@ -1,0 +1,44 @@
+import subprocess  
+import load_data_SGD
+import os
+import cnn_classify_plate
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_IMG_DIR = "/static/upload/"
+upload_path = BASE_DIR + BASE_IMG_DIR
+def seg_rec_interface(imgPath):
+	rs = subprocess.call(["./demo",imgPath])
+	if(rs == 0):
+		rs = cnn_classify_plate.predict()
+		plateRs = ''
+		for r in rs:
+			plateRs += str(r)
+		return plateRs
+		#print rs
+		#for r in rs:
+			#print r
+
+
+def locAndRec(imgPath,coordPath,platePath):
+	#coordination
+	rs = subprocess.call(["./demo",imgPath,coordPath,platePath])
+	point = []
+	if(rs == 0):
+		with open(coordPath) as f:
+			
+			while True:
+				line = f.readline()
+				if(line):
+					line = line.replace('[','').replace(']','')
+					line = line.split(',')
+					point.append(line)
+				else:
+					break
+        else:
+		print "error!!!!!"
+	return point,platePath
+
+if __name__ == "__main()__":
+	seg_rec_interface()
+
+
+
